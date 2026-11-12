@@ -1,0 +1,25 @@
+# Virtual Environments
+.venv/
+env/
+venv/
+ENV/
+env.bak/
+venv.bak/
+
+# Python & Testing Bytecode and Caches
+__pycache__/
+*.py[cod]
+*$py.class
+.pytest_cache/
+
+# Operating System Files
+.DS_Store
+Thumbs.db
+desktop.ini
+
+# Raw input data directory (App runs entirely on precomputed outputs/)
+Data Set/
+
+# Temporary and local log files
+*.log
+

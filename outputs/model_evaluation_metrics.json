@@ -1,0 +1,90 @@
+[
+    {
+        "dataset": "Validation",
+        "model_type": "logistic_regression",
+        "samples": 29359,
+        "brier_score": 0.17617348012527767,
+        "log_loss": 0.5135008306677036,
+        "roc_auc": 0.8099816644159679,
+        "accuracy": 0.716305051261964,
+        "precision": 0.6932400025925206,
+        "recall": 0.7483907080884411
+    },
+    {
+        "dataset": "Test",
+        "model_type": "logistic_regression",
+        "samples": 29702,
+        "brier_score": 0.1904275576148163,
+        "log_loss": 0.5574748558922038,
+        "roc_auc": 0.7859937631666846,
+        "accuracy": 0.697730792539223,
+        "precision": 0.6732574768388983,
+        "recall": 0.7441412961308501
+    },
+    {
+        "dataset": "Validation",
+        "model_type": "random_forest",
+        "samples": 29359,
+        "brier_score": 0.17317750354485972,
+        "log_loss": 0.505936176114979,
+        "roc_auc": 0.8167478503657634,
+        "accuracy": 0.7220613781123335,
+        "precision": 0.6903638395628958,
+        "recall": 0.7779876854184159
+    },
+    {
+        "dataset": "Test",
+        "model_type": "random_forest",
+        "samples": 29702,
+        "brier_score": 0.20185146348813982,
+        "log_loss": 0.5832212364884164,
+        "roc_auc": 0.7623292235025813,
+        "accuracy": 0.6785064978789307,
+        "precision": 0.6516308960834243,
+        "recall": 0.7386433922067211
+    },
+    {
+        "dataset": "Validation",
+        "model_type": "xgboost",
+        "samples": 29359,
+        "brier_score": 0.17253496023676235,
+        "log_loss": 0.5052148898166268,
+        "roc_auc": 0.8186042032127753,
+        "accuracy": 0.7234919445485201,
+        "precision": 0.6923604187437687,
+        "recall": 0.7774279317100475
+    },
+    {
+        "dataset": "Test",
+        "model_type": "xgboost",
+        "samples": 29702,
+        "brier_score": 0.20117507281080724,
+        "log_loss": 0.5806222346321989,
+        "roc_auc": 0.7651104984659025,
+        "accuracy": 0.6817722712275268,
+        "precision": 0.6553341863157254,
+        "recall": 0.7391931825991341
+    },
+    {
+        "dataset": "Validation",
+        "model_type": "ensemble",
+        "samples": 29359,
+        "brier_score": 0.1734422961313421,
+        "log_loss": 0.5069038467325954,
+        "roc_auc": 0.8161120904107563,
+        "accuracy": 0.7219932559010865,
+        "precision": 0.6956466232605643,
+        "recall": 0.7625244892247411
+    },
+    {
+        "dataset": "Test",
+        "model_type": "ensemble",
+        "samples": 29702,
+        "brier_score": 0.19432710524566005,
+        "log_loss": 0.5631989724297373,
+        "roc_auc": 0.7775280715808512,
+        "accuracy": 0.6908962359437075,
+        "precision": 0.6654343807763401,
+        "recall": 0.742217029757405
+    }
+]
