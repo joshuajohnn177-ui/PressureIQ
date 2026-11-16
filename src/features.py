@@ -18,37 +18,30 @@ logger = logging.getLogger(__name__)
 def compute_delivery_runs(df: pd.DataFrame) -> pd.Series:
     """Compute exact total runs awarded to the team on each delivery.
     
-    Verified Extras Logic:
-    - Normal delivery: batter runs off bat ('runs').
-    - Wide (code 2): 1 penalty extra run + 'extras_2_runs'. (Bat runs is 0).
-    - Overstep / No Ball (code 1): 1 penalty extra run + batter 'runs' + 'extras_2_runs'.
-    - Legbyes / Byes / Other / Penalty (codes 3, 4, 5, 7):
-        If 'runs' == 0, 1 extra run + 'extras_2_runs'.
-        Else 'runs' + 'extras_2_runs'.
+    Updated Dataset Encoding:
+    - 'runs': Runs scored directly off the bat by the striker (e.g. 0, 1, 2, 3, 4, 6).
+    - 'extras1_runs': Primary extra runs awarded to the batting team:
+        - wide: 1 (normal wide), 2 (wide+run), 3, 4, 5 (wide boundary)
+        - Overstep / No Ball: 1 (penalty run)
+        - byes: 1, 2, 3, 4 (bye boundary), 5
+        - legbyes: 1, 2, 3, 4 (legbye boundary), 5
+        - other: 1
+        - Penalty: 5
+    - 'extras_2_runs': Secondary extra runs occurring on the delivery:
+        - On Overstep: additional runs scored (e.g. 1 bye/legbye or 4 boundary)
+        - On other: additional boundary or overthrow runs (e.g. 1 or 4)
+
+    Cricket Scoring Invariant:
+    Total runs on any delivery is the exact sum of runs off the bat plus all extras.
+    Because runs and extras_2_runs are mutually exclusive (0 overlaps across 200,999 balls),
+    the arithmetic total is:
+        total_runs = runs + extras1_runs + extras_2_runs
     """
     runs = df["runs"].fillna(0).astype(int).values
+    extras_1 = df["extras1_runs"].fillna(0).astype(int).values
     extras_2 = df["extras_2_runs"].fillna(0).astype(int).values
-    extras_type = df["extras_type"].values
     
-    is_wide = extras_type == "wide"
-    is_nb = extras_type == "Overstep"
-    is_other_extra = np.isin(extras_type, ["legbyes", "byes", "other", "Penalty"])
-    
-    total_runs = runs.copy()
-    
-    # Wide adds 1 penalty + any boundary extra runs
-    total_runs = np.where(is_wide, 1 + extras_2, total_runs)
-    
-    # No-ball adds 1 penalty + batter runs + extras_2
-    total_runs = np.where(is_nb, 1 + runs + extras_2, total_runs)
-    
-    # Byes and legbyes: if runs==0, awards 1 run + extras_2; otherwise runs + extras_2
-    total_runs = np.where(
-        is_other_extra,
-        np.where(runs == 0, 1 + extras_2, runs + extras_2),
-        total_runs,
-    )
-    
+    total_runs = runs + extras_1 + extras_2
     return pd.Series(total_runs, index=df.index, dtype=int)
 
 

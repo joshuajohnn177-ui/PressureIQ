@@ -49,7 +49,7 @@ def test_dashboard_data_loaders(dashboard_data):
 
 
 def test_leaderboard_section_integrity(dashboard_data):
-    """Verify Section 1 (Official Top 10 Leaderboards) fields and values."""
+    """Verify Section 1 (Official Top 10 Leaderboards) fields, schema, and sorting integrity."""
     top_bat = dashboard_data["top_bat"]
     top_bowl = dashboard_data["top_bowl"]
 
@@ -61,15 +61,37 @@ def test_leaderboard_section_integrity(dashboard_data):
     for col in required_bat_cols:
         assert col in top_bat.columns, f"Missing column in top10_batters: {col}"
 
-    # Verify #1 Batter is Suryakumar Yadav
-    assert top_bat.iloc[0]["Player Name"] == "Suryakumar Yadav"
-    assert top_bat.iloc[0]["Rank"] == 1
-    assert top_bat.iloc[0]["PressureIQ Score"] > 400.0
+    required_bowl_cols = [
+        "Rank", "Player Name", "Pressure Matches", "Pressure Balls",
+        "Pressure Wickets", "Baseline Economy", "Pressure Economy", "Economy Differential (+/-)",
+        "Total Pressure WPA", "Shrunk WPA / Ball", "PressureIQ Score", "Reliability Weight"
+    ]
+    for col in required_bowl_cols:
+        assert col in top_bowl.columns, f"Missing column in top10_bowlers: {col}"
 
-    # Verify #1 Bowler is Rashid Khan
-    assert top_bowl.iloc[0]["Player Name"] == "Rashid Khan"
+    # Verify ranks are ordered 1 to 10
+    assert list(top_bat["Rank"]) == list(range(1, 11))
+    assert list(top_bowl["Rank"]) == list(range(1, 11))
+
+    # Verify scores are strictly monotonic non-increasing (sorted descending)
+    assert (top_bat["PressureIQ Score"].diff().dropna() <= 1e-5).all(), "Batter scores not sorted descending"
+    assert (top_bowl["PressureIQ Score"].diff().dropna() <= 1e-5).all(), "Bowler scores not sorted descending"
+
+    # Verify #1 Rank Batter validity
+    assert top_bat.iloc[0]["Rank"] == 1
+    assert top_bat.iloc[0]["PressureIQ Score"] > 200.0
+    assert len(top_bat.iloc[0]["Player Name"]) > 0
+
+    # Verify #1 Rank Bowler validity
     assert top_bowl.iloc[0]["Rank"] == 1
-    assert top_bowl.iloc[0]["PressureIQ Score"] > 300.0
+    assert top_bowl.iloc[0]["PressureIQ Score"] > 200.0
+    assert len(top_bowl.iloc[0]["Player Name"]) > 0
+
+    # Verify all numerical values are finite and non-null
+    assert np.isfinite(top_bat["PressureIQ Score"]).all()
+    assert np.isfinite(top_bowl["PressureIQ Score"]).all()
+    assert not top_bat.isna().any().any()
+    assert not top_bowl.isna().any().any()
 
 
 def test_csv_download_buffers(dashboard_data):

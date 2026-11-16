@@ -12,7 +12,7 @@ OUTPUTS_DIR = PROJECT_ROOT / "outputs"
 FIGURES_DIR = OUTPUTS_DIR / "figures"
 
 # Raw Data Files
-BALL_BY_BALL_FILE = DATA_DIR / "ball_by_ball.csv"
+BALL_BY_BALL_FILE = DATA_DIR / "ball_by_ball updated.csv"
 MATCHES_FILE = DATA_DIR / "matches.csv"
 COMPETITIONS_FILE = DATA_DIR / "competitions.csv"
 TEAMS_FILE = DATA_DIR / "teams.csv"

@@ -12,6 +12,7 @@ from src.features import compute_delivery_runs, engineer_ball_features
 
 @pytest.fixture(scope="session")
 def raw_data():
+    """Exercise the actual production loading function directly."""
     return load_raw_datasets()
 
 

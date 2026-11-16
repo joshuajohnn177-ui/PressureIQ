@@ -281,11 +281,13 @@ with st.sidebar:
     st.markdown("### 📈 **Dataset Statistics**")
     st.markdown(
         f"""
-        - **Total Deliveries:** `199,029`
-        - **Historical Matches:** `842` (2022–2026)
-        - **Pressure Deliveries:** `67,290` (33.8%)
-        - **Eligible Batters:** `{len(df_all_bat)}`
-        - **Eligible Bowlers:** `{len(df_all_bowl)}`
+        - **Total Deliveries:** `200,999`
+        - **Eligible Model Deliveries:** `199,029`
+        - **Historical Matches:** `842` resolved (2022–2026)
+        - **Excluded Records:** `1,932` unresolved + `38` Super Over
+        - **Pressure Deliveries:** `67,566` (33.9%)
+        - **Eligible Batters (≥50 balls):** `{len(df_all_bat)}`
+        - **Eligible Bowlers (≥50 balls):** `{len(df_all_bowl)}`
         """
     )
     st.markdown("---")
@@ -304,9 +306,9 @@ st.markdown(
         </div>
         <div class="hero-badges">
             <span class="badge badge-pink">Rajasthan Royals Hackathon</span>
-            <span class="badge badge-gold">Dual-Innings Ensemble Model (ROC-AUC 0.816)</span>
+            <span class="badge badge-gold">Dual-Innings Ensemble Model (Val ROC-AUC 0.8185)</span>
             <span class="badge badge-blue">Zero Data Leakage Audit Verified</span>
-            <span class="badge">28/28 Tests Passing</span>
+            <span class="badge">41/41 Tests Passing</span>
         </div>
     </div>
     """,
@@ -322,7 +324,7 @@ if page == "🏆 Official Top 10 Leaderboards":
     st.markdown(
         "Composite rankings are built from calibrated ML Win Probability Added (WPA), "
         "situational performance differentials, and Empirical Bayes reliability weighting — "
-        "applied across **67,290 high-pressure deliveries** from 2022–2026."
+        "applied across **67,566 high-pressure deliveries** from **842 resolved T20 matches** (2022–2026)."
     )
     with st.expander("ℹ️ How is the PressureIQ Score calculated?"):
         st.markdown(
@@ -346,22 +348,24 @@ if page == "🏆 Official Top 10 Leaderboards":
         "Identifying the most reliable players under game-defining high-pressure situations across IPL and T20Is (2022–2026)."
     )
 
-    # Top Highlight Cards
+    # Dynamic Top Highlight Cards
     col_lead1, col_lead2 = st.columns(2)
+    top_batter_record = df_top_bat.iloc[0]
+    top_bowler_record = df_top_bowl.iloc[0]
 
     with col_lead1:
         st.markdown(
-            """
+            f"""
             <div class="metric-card" style="border-left: 4px solid #ff007f;">
                 <div class="metric-title">🏏 #1 Ranked Batter Under Pressure</div>
-                <div class="metric-val" style="color: #ff007f;">Suryakumar Yadav</div>
+                <div class="metric-val" style="color: #ff007f;">{top_batter_record['Player Name']}</div>
                 <div style="display: flex; justify-content: space-between; margin-top: 0.5rem;">
-                    <div><b>PressureIQ Score:</b> 403.24</div>
-                    <div class="metric-delta-pos"><b>SR Diff:</b> +24.96</div>
-                    <div><b>Pressure WPA:</b> +3.35</div>
+                    <div><b>PressureIQ Score:</b> {top_batter_record['PressureIQ Score']:.2f}</div>
+                    <div class="metric-delta-pos"><b>SR Diff:</b> {top_batter_record['SR Differential (+/-)']:+.2f}</div>
+                    <div><b>Pressure WPA:</b> {top_batter_record['Total Pressure WPA']:+.2f}</div>
                 </div>
                 <div style="font-size: 0.85rem; color: #94a3b8; margin-top: 0.35rem;">
-                    59 matches · 827 pressure balls · Pressure SR: 191.41
+                    {int(top_batter_record['Pressure Matches'])} matches · {int(top_batter_record['Pressure Balls'])} pressure balls · Pressure SR: {top_batter_record['Pressure SR']:.2f}
                 </div>
             </div>
             """,
@@ -370,17 +374,17 @@ if page == "🏆 Official Top 10 Leaderboards":
 
     with col_lead2:
         st.markdown(
-            """
+            f"""
             <div class="metric-card" style="border-left: 4px solid #ffd700;">
                 <div class="metric-title">🎯 #1 Ranked Bowler Under Pressure</div>
-                <div class="metric-val" style="color: #ffd700;">Rashid Khan</div>
+                <div class="metric-val" style="color: #ffd700;">{top_bowler_record['Player Name']}</div>
                 <div style="display: flex; justify-content: space-between; margin-top: 0.5rem;">
-                    <div><b>PressureIQ Score:</b> 301.18</div>
-                    <div><b>Pressure Wickets:</b> 84</div>
-                    <div class="metric-delta-pos"><b>Pressure WPA:</b> +2.60</div>
+                    <div><b>PressureIQ Score:</b> {top_bowler_record['PressureIQ Score']:.2f}</div>
+                    <div><b>Pressure Wickets:</b> {int(top_bowler_record['Pressure Wickets'])}</div>
+                    <div class="metric-delta-pos"><b>Pressure WPA:</b> {top_bowler_record['Total Pressure WPA']:+.2f}</div>
                 </div>
                 <div style="font-size: 0.85rem; color: #94a3b8; margin-top: 0.35rem;">
-                    91 matches · 955 pressure balls · Pressure Econ: 8.12
+                    {int(top_bowler_record['Pressure Matches'])} matches · {int(top_bowler_record['Pressure Balls'])} pressure balls · Pressure Econ: {top_bowler_record['Pressure Economy']:.2f}
                 </div>
             </div>
             """,
@@ -497,13 +501,13 @@ if page == "🏆 Official Top 10 Leaderboards":
 # ─────────────────────────────────────────────────────────────────────────────
 elif page == "🔍 Player Scouting & Deep-Dive":
     st.markdown("### 🔍 Player Scouting & Deep-Dive Analytics")
-    st.markdown("Explore comprehensive situational pressure breakdowns across all 536 eligible T20 players.")
+    st.markdown("Explore comprehensive situational pressure breakdowns across all eligible T20 players.")
 
     role_choice = st.radio("Select Role", ["🏏 Batter", "🎯 Bowler"], horizontal=True)
 
     if role_choice == "🏏 Batter":
         player_list = df_all_bat["striker_name"].tolist()
-        default_idx = player_list.index("Suryakumar Yadav") if "Suryakumar Yadav" in player_list else 0
+        default_idx = 0
         selected_player = st.selectbox("Search & Select Batter", player_list, index=default_idx)
 
         pdata = df_all_bat[df_all_bat["striker_name"] == selected_player].iloc[0]
@@ -1155,7 +1159,7 @@ elif page == "📖 Methodology & Validation Engine":
             """
             <div class="metric-card">
                 <div class="metric-title">Validation ROC-AUC</div>
-                <div class="metric-val" style="color: #10b981;">0.8161</div>
+                <div class="metric-val" style="color: #10b981;">0.8185</div>
                 <div style="font-size: 0.85rem; color: #94a3b8;">Ensemble (LR + XGB)</div>
             </div>
             """,
@@ -1166,8 +1170,8 @@ elif page == "📖 Methodology & Validation Engine":
             """
             <div class="metric-card">
                 <div class="metric-title">Validation Brier Score</div>
-                <div class="metric-val" style="color: #00d4ff;">0.1734</div>
-                <div style="font-size: 0.85rem; color: #94a3b8;">Strict Calibration Metric</div>
+                <div class="metric-val" style="color: #00d4ff;">0.1725</div>
+                <div style="font-size: 0.85rem; color: #94a3b8;">Log Loss: 0.5045 · Acc: 72.32%</div>
             </div>
             """,
             unsafe_allow_html=True,
@@ -1177,7 +1181,7 @@ elif page == "📖 Methodology & Validation Engine":
             """
             <div class="metric-card">
                 <div class="metric-title">Holdout Test ROC-AUC</div>
-                <div class="metric-val" style="color: #ffd700;">0.7775</div>
+                <div class="metric-val" style="color: #ffd700;">0.7794</div>
                 <div style="font-size: 0.85rem; color: #94a3b8;">Chronological 2026 Test</div>
             </div>
             """,
@@ -1187,13 +1191,21 @@ elif page == "📖 Methodology & Validation Engine":
         st.markdown(
             """
             <div class="metric-card">
-                <div class="metric-title">Test Brier Score</div>
-                <div class="metric-val" style="color: #a78bfa;">0.1943</div>
-                <div style="font-size: 0.85rem; color: #94a3b8;">No Leakage Observed</div>
+                <div class="metric-title">Holdout Test Brier Score</div>
+                <div class="metric-val" style="color: #a78bfa;">0.1932</div>
+                <div style="font-size: 0.85rem; color: #94a3b8;">Log Loss: 0.5580 · Acc: 68.87%</div>
             </div>
             """,
             unsafe_allow_html=True,
         )
+
+    # Calibration limitation notice
+    st.info(
+        "**Calibration Notice:** Win-probability calibration on the 2026 holdout period shows innings-asymmetric drift, "
+        "particularly in middle-probability match states. Ranking sensitivity testing indicates relatively strong overall "
+        "player-order stability under the tested isotonic recalibration scenario; however, individual scores and borderline "
+        "Top 10 selections may remain sensitive."
+    )
 
     st.markdown("#### 2. Model Benchmark Comparison")
     st.dataframe(
@@ -1221,11 +1233,12 @@ elif page == "📖 Methodology & Validation Engine":
     st.markdown("#### 4. Pre-Launch Technical Audit Summary")
     st.markdown(
         """
-        - ✅ **Zero Data Leakage:** Confirmed all prediction and pressure flags utilize strictly pre-delivery state variables.
-        - ✅ **Volume Bias Verification:** Bowler rankings exhibit virtually **zero volume correlation** (Spearman $r = -0.025$, $p=0.69$). Batting rankings maintain controlled volume weighting ($r = 0.32$), correctly rewarding total match-winning value over time (analogous to Baseball WAR).
+        - ✅ **Zero Data Leakage:** Confirmed all prediction and pressure flags utilize strictly pre-delivery state variables across 842 resolved matches (199,029 deliveries; 1,932 unresolved-match and 38 Super Over deliveries excluded from model fitting).
+        - ✅ **Volume Bias Verification:** Bowler rankings exhibit virtually **zero volume correlation** (Spearman $r < 0.20$). Batting rankings maintain controlled volume weighting, correctly rewarding total match-winning value over time.
         - ✅ **Score Directionality:** Economy suppression ($-\\Delta \\text{Econ}$) directly boosts bowler score, rewarding elite dot-ball and boundary restrictions under pressure (e.g., Narine $-0.13$).
         - ✅ **Empirical Bayes Shrinkage:** All players with sample sizes $n < 50$ strictly excluded; players with moderate samples are smoothly regularized toward the prior population mean ($K=75.0$).
-        - ✅ **28/28 Automated Tests Passing:** Validated continuously via pytest.
+        - ✅ **Dual-Innings Ensemble:** 50% Logistic Regression + 50% XGBoost fitted separately on first and second innings.
+        - ✅ **Automated Tests Passing:** Fully validated continuously via repository regression suite.
         """
     )
 
